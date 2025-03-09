@@ -37,7 +37,21 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        // 添加新元素到数组末尾
+        self.items.push(value);
+        self.count += 1;
+        
+        // 向上调整堆（上浮）
+        let mut idx = self.count;
+        while idx > 1 {
+            let parent = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[parent]) {
+                self.items.swap(idx, parent);
+                idx = parent;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +71,25 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        // 如果没有子节点，返回当前节点
+        if !self.children_present(idx) {
+            return idx;
+        }
+
+        let left = self.left_child_idx(idx);
+        let right = self.right_child_idx(idx);
+
+        // 如果右子节点不存在，返回左子节点
+        if right > self.count {
+            return left;
+        }
+
+        // 根据比较器返回最适合的子节点
+        if (self.comparator)(&self.items[left], &self.items[right]) {
+            left
+        } else {
+            right
+        }
     }
 }
 
@@ -84,8 +115,35 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            return None;
+        }
+
+        // 保存堆顶元素
+        let return_item = std::mem::replace(&mut self.items[1], T::default());
+        
+        // 将最后一个元素移到堆顶
+        if self.count > 1 {
+            self.items[1] = self.items.pop().unwrap();
+        } else {
+            self.items.pop();
+        }
+        
+        self.count -= 1;
+
+        // 向下调整堆（下沉）
+        let mut current = 1;
+        while self.children_present(current) {
+            let child = self.smallest_child_idx(current);
+            if (self.comparator)(&self.items[child], &self.items[current]) {
+                self.items.swap(current, child);
+                current = child;
+            } else {
+                break;
+            }
+        }
+
+        Some(return_item)
     }
 }
 

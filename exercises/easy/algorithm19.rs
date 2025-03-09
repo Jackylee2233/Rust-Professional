@@ -11,9 +11,55 @@
 
 use std::fmt::{self, Display, Formatter};
 
+// 定义2x2矩阵结构体
+#[derive(Clone, Copy)]
+struct Matrix {
+    data: [[i32; 2]; 2]
+}
+
+impl Matrix {
+    // 矩阵乘法
+    fn multiply(&self, other: &Matrix) -> Matrix {
+        let mut result = Matrix { data: [[0; 2]; 2] };
+        for i in 0..2 {
+            for j in 0..2 {
+                for k in 0..2 {
+                    result.data[i][j] += self.data[i][k] * other.data[k][j];
+                }
+            }
+        }
+        result
+    }
+
+    // 矩阵快速幂
+    fn power(self, mut n: i32) -> Matrix {
+        let mut result = Matrix { data: [[1, 0], [0, 1]] }; // 单位矩阵
+        let mut base = self;
+        
+        while n > 0 {
+            if n & 1 == 1 {
+                result = result.multiply(&base);
+            }
+            base = base.multiply(&base);
+            n >>= 1;
+        }
+        result
+    }
+}
+
 pub fn fib(n: i32) -> i32 {
-    // TODO: Implement the logic to calculate the nth Fibonacci number using matrix exponentiation
-    0 // Placeholder return value
+    if n <= 1 {
+        return n;
+    }
+    
+    // 构建基础矩阵 [[1, 1], [1, 0]]
+    let base = Matrix { data: [[1, 1], [1, 0]] };
+    
+    // 计算矩阵的n-1次幂
+    let result = base.power(n - 1);
+    
+    // 返回矩阵中的[0][0]元素，即为第n个斐波那契数
+    result.data[0][0]
 }
 
 #[cfg(test)]

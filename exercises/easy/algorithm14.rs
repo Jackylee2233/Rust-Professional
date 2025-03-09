@@ -12,9 +12,31 @@
 use std::fmt::{self, Display, Formatter};
 
 pub fn find_duplicates(nums: Vec<i32>) -> Vec<i32> {
-    // TODO: Implement the logic to find all duplicates in the array
-    Vec::new() // Placeholder return value
+    let mut nums = nums;
+    let mut result = Vec::new();
+    let n = nums.len();
+    
+    for i in 0..n {
+        // Get the actual value at current position, taking abs in case it was marked negative
+        let curr_val = nums[i].abs();
+        // Map the value to a valid index (1-based to 0-based indexing)
+        let index = ((curr_val - 1) % n as i32) as usize;
+        
+        if nums[index] > 0 {
+            nums[index] = -nums[index];
+        } else {
+            // If we find a negative number, this value has been seen before
+            // Add the original number (not the index)
+            result.push(curr_val);
+        }
+    }
+    
+    // Sort and remove duplicates
+    result.sort_unstable();
+    result.dedup();
+    result
 }
+
 
 #[cfg(test)]
 mod tests {

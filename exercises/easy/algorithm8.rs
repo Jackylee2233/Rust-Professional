@@ -52,30 +52,51 @@ impl<T> Default for Queue<T> {
     }
 }
 
-pub struct myStack<T>
-{
-	//TODO
-	q1:Queue<T>,
-	q2:Queue<T>
+pub struct myStack<T> {
+    q1: Queue<T>,
+    q2: Queue<T>
 }
+
 impl<T> myStack<T> {
     pub fn new() -> Self {
         Self {
-			//TODO
-			q1:Queue::<T>::new(),
-			q2:Queue::<T>::new()
+            q1: Queue::new(),
+            q2: Queue::new()
         }
     }
+    
     pub fn push(&mut self, elem: T) {
-        //TODO
+        // 总是将元素放入非空的队列中，如果两个都为空则放入q1
+        if !self.q1.is_empty() {
+            self.q1.enqueue(elem);
+        } else {
+            self.q2.enqueue(elem);
+        }
     }
+    
     pub fn pop(&mut self) -> Result<T, &str> {
-        //TODO
-		Err("Stack is empty")
+        // 确定哪个队列有元素
+        let (from_queue, to_queue) = if !self.q1.is_empty() {
+            (&mut self.q1, &mut self.q2)
+        } else if !self.q2.is_empty() {
+            (&mut self.q2, &mut self.q1)
+        } else {
+            return Err("Stack is empty");
+        };
+
+        // 将除了最后一个元素外的所有元素移到另一个队列
+        while from_queue.size() > 1 {
+            if let Ok(item) = from_queue.dequeue() {
+                to_queue.enqueue(item);
+            }
+        }
+
+        // 返回最后一个元素
+        from_queue.dequeue()
     }
+    
     pub fn is_empty(&self) -> bool {
-		//TODO
-        true
+        self.q1.is_empty() && self.q2.is_empty()
     }
 }
 

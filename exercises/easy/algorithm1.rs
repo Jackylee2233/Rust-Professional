@@ -69,15 +69,41 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+
+    pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self 
+    where T: Ord
+    {
+        let mut result = LinkedList::new();
+        let mut current_a = list_a.start;
+        let mut current_b = list_b.start;
+
+        while let (Some(a), Some(b)) = (current_a, current_b) {
+            let a_val = unsafe { &(*a.as_ptr()).val };
+            let b_val = unsafe { &(*b.as_ptr()).val };
+
+            if a_val <= b_val {
+                result.add(unsafe { std::ptr::read(&(*a.as_ptr()).val) });
+                current_a = unsafe { (*a.as_ptr()).next };
+            } else {
+                result.add(unsafe { std::ptr::read(&(*b.as_ptr()).val) });
+                current_b = unsafe { (*b.as_ptr()).next };
+            }
         }
-	}
+
+        // Handle remaining elements in list_a
+        while let Some(a) = current_a {
+            result.add(unsafe { std::ptr::read(&(*a.as_ptr()).val) });
+            current_a = unsafe { (*a.as_ptr()).next };
+        }
+
+        // Handle remaining elements in list_b
+        while let Some(b) = current_b {
+            result.add(unsafe { std::ptr::read(&(*b.as_ptr()).val) });
+            current_b = unsafe { (*b.as_ptr()).next };
+        }
+
+        result
+    }
 }
 
 impl<T> Display for LinkedList<T>

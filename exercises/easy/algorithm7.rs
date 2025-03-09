@@ -31,8 +31,11 @@ impl<T> Stack<T> {
 		self.size += 1;
 	}
 	fn pop(&mut self) -> Option<T> {
-		// TODO
-		None
+		if 0 == self.size {
+			return None;
+		}
+		self.size -= 1;
+		self.data.pop()
 	}
 	fn peek(&self) -> Option<&T> {
 		if 0 == self.size {
@@ -101,8 +104,44 @@ impl<'a, T> Iterator for IterMut<'a, T> {
 
 fn bracket_match(bracket: &str) -> bool
 {
-	//TODO
-	true
+    // 创建一个栈来存储左括号
+    let mut stack = Stack::new();
+    
+    // 遍历字符串中的每个字符
+    for c in bracket.chars() {
+        match c {
+            // 如果是左括号，压入栈中
+            '(' | '[' | '{' => stack.push(c),
+            
+            // 如果是右括号，检查是否匹配
+            ')' | ']' | '}' => {
+                // 如果栈为空，说明没有匹配的左括号
+                if stack.is_empty() {
+                    return false;
+                }
+                
+                // 获取栈顶的左括号
+                if let Some(top) = stack.pop() {
+                    // 检查是否匹配
+                    let matched = match (top, c) {
+                        ('(', ')') => true,
+                        ('[', ']') => true,
+                        ('{', '}') => true,
+                        _ => false
+                    };
+                    
+                    if !matched {
+                        return false;
+                    }
+                }
+            }
+            // 忽略其他字符
+            _ => {}
+        }
+    }
+    
+    // 最后检查栈是否为空，如果不为空说明有未匹配的左括号
+    stack.is_empty()
 }
 
 #[cfg(test)]

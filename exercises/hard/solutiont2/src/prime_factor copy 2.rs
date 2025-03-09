@@ -1,4 +1,4 @@
-// sieve 函数实现了埃氏筛法来生成质数表
+
 fn sieve(limit: usize) -> Vec<u128> {
     let mut is_prime = vec![true; limit];
     for i in 2..is_prime.len() {
